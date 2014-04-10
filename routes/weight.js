@@ -34,6 +34,7 @@ exports.postWeight = function(req,res){
     newWeight.save(function(err){
         errorHandler(err, function() {
             res.send(successMessage);
+            socket.emit('reload', {});
         });
     });
 };

@@ -1,11 +1,24 @@
+//Initialization
 var express = require('express'),
+    app = express(),
+    server = require('http').createServer(app),
+    io = require('socket.io').listen(server),
     weight = require('./routes/weight');
 
-var app = express();
+//Middleware: Allow cross-domain requests (CORS)
+var allowCrossDomain = function(req,res,next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+}
 
+//Configure server behavior
 app.configure(function(){
     app.use(express.json());
     app.use(express.urlencoded());
+    app.use(allowCrossDomain);
+    app.use(express.static(__dirname + '/public'));
 });
 
 //REST API
@@ -14,9 +27,20 @@ app.get('/', function(req,res){
 });
 app.get('/getweights', weight.getWeights);
 app.get('/getweights/:id', weight.findWeight);
+app.get('/reload', function(req,res){
+    res.send('reloading!');
+    io.sockets.emit('reload', {});
+});
 app.post('/postweight', weight.postWeight);
 app.put('/updateweight/:id', weight.updateWeight);
 app.delete('/deleteweight/:id', weight.deleteWeight);
 
-app.listen(3000);
+io.on('connection', function(socket){
+    socket.on('client_data', function(data){
+        console.log(data.letter);
+    });
+});
+
+server.listen(3000);
+
 console.log("WeightWatcher::Listening on port 3000");

@@ -28,18 +28,14 @@ app.get('/', function(req,res){
 app.get('/getweights', weight.getWeights);
 app.get('/getweights/:id', weight.findWeight);
 app.get('/reload', function(req,res){
-    res.send('reloading!');
+    res.send('Reloading!');
     io.sockets.emit('reload', {});
 });
 app.post('/postweight', weight.postWeight);
 app.put('/updateweight/:id', weight.updateWeight);
 app.delete('/deleteweight/:id', weight.deleteWeight);
 
-io.on('connection', function(socket){
-    socket.on('client_data', function(data){
-        console.log(data.letter);
-    });
-});
+module.exports.io = io;
 
 server.listen(3000);
 

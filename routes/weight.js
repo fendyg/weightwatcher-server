@@ -1,9 +1,11 @@
-var dbconnect = require('../dbconnect'),
+var server = require('../server'),
+    dbconnect = require('../dbconnect'),
     Weight = dbconnect.Weight;
 
 //Error Handler
-function errorHandler(err, callback) {
+function errorHandler(err, res, callback) {
     if(err) {
+        res.send(500, 'Server error!');
         console.log(err);
     } else {
         //If callback exists, call it
@@ -16,7 +18,7 @@ function errorHandler(err, callback) {
 //Retrieve all records
 exports.getWeights = function(req,res) {
     Weight.find({}, function(err, data){
-        errorHandler(err, function(){
+        errorHandler(err, res, function(){
             res.send(data);
         });
     });
@@ -32,9 +34,10 @@ exports.postWeight = function(req,res){
     var successMessage = 'Insert succesful! Weight: '+ req.body.weight + ' Date: ' + req.body.date;
 
     newWeight.save(function(err){
-        errorHandler(err, function() {
+        errorHandler(err, res, function() {
             res.send(successMessage);
-            socket.emit('reload', {});
+            // io.sockets.emit('reload', {});
+            server.io.sockets.emit('reload', {});
         });
     });
 };
@@ -45,7 +48,7 @@ exports.findWeight = function(req,res) {
     console.log('Retrieving weight: ' + id);
 
     Weight.findOne({ '_id': id}, function(err, data){
-        errorHandler(err, function(){
+        errorHandler(err, res, function(){
             res.send(data);
         });
     });
@@ -58,9 +61,10 @@ exports.updateWeight = function(req,res) {
     console.log('Updating weight: ' + id);
 
     Weight.update({ '_id': id }, {date: req.body.date, weight: req.body.weight}, function(err,data) {
-        errorHandler(err, function(){
+        errorHandler(err, res, function(){
             var successMessage = 'ID: ' + id + ' updated!';
             res.send(successMessage);
+            io.sockets.emit('reload', {});
         });
     });
 };
@@ -72,9 +76,10 @@ exports.deleteWeight = function(req,res) {
     console.log('Deleting weight: ' + id);
 
     Weight.remove({ '_id': id }, function(err,data) {
-        errorHandler(err, function(){
+        errorHandler(err, res, function(){
             var successMessage = 'ID: ' + id + ' removed!';
             res.send(successMessage);
+            io.sockets.emit('reload', {});
         });
     });
 };

@@ -36,7 +36,6 @@ exports.postWeight = function(req,res){
     newWeight.save(function(err){
         errorHandler(err, res, function() {
             res.send(successMessage);
-            // io.sockets.emit('reload', {});
             server.io.sockets.emit('reload', {});
         });
     });
@@ -64,7 +63,7 @@ exports.updateWeight = function(req,res) {
         errorHandler(err, res, function(){
             var successMessage = 'ID: ' + id + ' updated!';
             res.send(successMessage);
-            io.sockets.emit('reload', {});
+            server.io.sockets.emit('reload', {});
         });
     });
 };
@@ -79,7 +78,7 @@ exports.deleteWeight = function(req,res) {
         errorHandler(err, res, function(){
             var successMessage = 'ID: ' + id + ' removed!';
             res.send(successMessage);
-            io.sockets.emit('reload', {});
+            server.io.sockets.emit('reload', {});
         });
     });
 };

@@ -5,6 +5,10 @@ var express = require('express'),
     io = require('socket.io').listen(server),
     weight = require('./routes/weight');
 
+// Socket IO Config
+io.set('log level', 1);
+module.exports.io = io;
+
 //Middleware: Allow cross-domain requests (CORS)
 var allowCrossDomain = function(req,res,next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -35,7 +39,6 @@ app.post('/postweight', weight.postWeight);
 app.put('/updateweight/:id', weight.updateWeight);
 app.delete('/deleteweight/:id', weight.deleteWeight);
 
-module.exports.io = io;
 
 server.listen(3000);
 
